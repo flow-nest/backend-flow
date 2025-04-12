@@ -25,6 +25,61 @@ model User {
   @@map("users")
 }
 
+model Shelve {
+  id            String    @id @default(uuid())
+  location      String
+  capacity      Int
+  currentLoad   Int
+  accessibility Boolean
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at")
+  packages      Package[]
+
+  @@map("shelves")
+}
+
+model Robot {
+  id             String   @id @default(uuid())
+  name           String
+  status         String
+  battery        Int
+  location       String
+  lastMaintained String   @map("last_maintained")
+  tasks          Task[]
+
+  @@map("robots")
+}
+
+model Package {
+  id        String   @id @default(uuid())
+  qrCode    String   @unique @map("qr_code")
+  size      Int
+  weight    Int
+  location  String
+  status    String
+  shelfId   String?  @map("shelf_id")
+  shelf     Shelve?  @relation(fields: [shelfId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  tasks     Task[]
+
+  @@map("packages")
+}
+
+model Task {
+  id          String    @id @default(uuid())
+  packageId   String    @map("package_id")
+  package     Package   @relation(fields: [packageId], references: [id])
+  robotId     String    @map("robot_id")
+  robot       Robot     @relation(fields: [robotId], references: [id])
+  status      String
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+  completedAt DateTime? @map("completed_at")
+
+  @@map("tasks")
+}
+
 enum Role {
   USER
   ADMIN
